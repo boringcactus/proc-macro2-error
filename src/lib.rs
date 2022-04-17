@@ -275,8 +275,6 @@
 #![forbid(unsafe_code)]
 #![allow(clippy::needless_doctest_main)]
 
-extern crate proc_macro;
-
 pub use crate::{
     diagnostic::{Diagnostic, DiagnosticExt, Level},
     dummy::{append_dummy, set_dummy},
@@ -424,9 +422,9 @@ impl<T> OptionExt for Option<T> {
 ///
 /// **NOT PUBLIC API, SUBJECT TO CHANGE WITHOUT ANY NOTICE**
 #[doc(hidden)]
-pub fn entry_point<F>(f: F, proc_macro_hack: bool) -> proc_macro::TokenStream
+pub fn entry_point<F>(f: F, proc_macro_hack: bool) -> proc_macro2::TokenStream
 where
-    F: FnOnce() -> proc_macro::TokenStream + UnwindSafe,
+    F: FnOnce() -> proc_macro2::TokenStream + UnwindSafe,
 {
     ENTERED_ENTRY_POINT.with(|flag| flag.set(flag.get() + 1));
     let caught = catch_unwind(f);
@@ -491,7 +489,6 @@ fn check_correctness() {
 #[doc(hidden)]
 pub mod __export {
     // reexports for use in macros
-    pub extern crate proc_macro;
     pub extern crate proc_macro2;
 
     use proc_macro2::Span;
@@ -539,15 +536,6 @@ pub mod __export {
             SpanRange {
                 first: *self,
                 last: *self,
-            }
-        }
-    }
-
-    impl SpanAsSpanRange for proc_macro::Span {
-        fn FIRST_ARG_MUST_EITHER_BE_Span_OR_IMPLEMENT_ToTokens_OR_BE_SpanRange(&self) -> SpanRange {
-            SpanRange {
-                first: self.clone().into(),
-                last: self.clone().into(),
             }
         }
     }
